@@ -15,6 +15,6 @@ public interface CommentService {
 
     ResponseEntity<Comment> save (Comment comment);
 
-    ResponseEntity<Comment> update (Comment comment);
+    ResponseEntity<Comment> update (Long id, Comment comment);
 
 }
