@@ -1,19 +1,20 @@
 package com.bootcamp.blogs.service;
 
 import com.bootcamp.blogs.entity.Post;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface PostService {
 
-    List<Post> findAll();
+    ResponseEntity<List<Post>> findAll();
 
-    Post findbyId(Long id);
+    ResponseEntity<Post> findbyId(Long id);
 
-    void delete(Long id);
+    ResponseEntity<Void> delete(Long id);
 
-    Post save (Post post);
+    ResponseEntity<Post> save (Post post);
 
-    Post update (Post post);
+    ResponseEntity<Post> update (Post post);
 
 }

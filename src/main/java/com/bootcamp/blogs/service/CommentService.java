@@ -1,19 +1,20 @@
 package com.bootcamp.blogs.service;
 
 import com.bootcamp.blogs.entity.Comment;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface CommentService {
 
-    List<Comment> findAll();
+    ResponseEntity<List<Comment>> findAll();
 
-    Comment findById (Long id);
+    ResponseEntity<Comment> findById (Long id);
 
-    void delete(Long id);
+    ResponseEntity<Void> delete(Long id);
 
-    Comment save (Comment comment);
+    ResponseEntity<Comment> save (Comment comment);
 
-    Comment update (Comment comment);
+    ResponseEntity<Comment> update (Comment comment);
 
 }
