@@ -63,7 +63,19 @@ public class AuthorServiceImpl implements AuthorService {
     public ResponseEntity<Author> save(Author author) {
 
         try {
-            author.setBlogList(new ArrayList<>());
+
+            if (author.getBlogList() != null) {
+
+                if (author.getBlogList().size() >= 3) {
+                    return new ResponseEntity<Author>(HttpStatus.PRECONDITION_FAILED);
+                } else {
+                    author.setBlogList(author.getBlogList());
+                }
+
+            } else {
+                author.setBlogList(new ArrayList<>());
+            }
+
             Author authorSaved = authorRepository.save(author);
             return new ResponseEntity<Author>(authorSaved, HttpStatus.OK);
         }catch (Exception e) {
@@ -86,7 +98,7 @@ public class AuthorServiceImpl implements AuthorService {
 
                 List<Blog> blogList = findAuthor.getBlogList();
 
-                /* for (Blog blogItem : blogList) {
+                for (Blog blogItem : blogList) {
 
                     List<Post> postList = blogItem.getPostList();
 
@@ -106,7 +118,7 @@ public class AuthorServiceImpl implements AuthorService {
 
                     blogRepository.delete(blogItem);
                 }
-                */
+
                 authorRepository.delete(findAuthor);
                 return new ResponseEntity<Void>(HttpStatus.OK);
             }

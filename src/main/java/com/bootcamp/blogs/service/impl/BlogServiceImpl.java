@@ -95,7 +95,7 @@ public class BlogServiceImpl implements BlogService {
             blogFind.setDescription(blog.getDescription() != null ? blog.getDescription() : blogFind.getDescription());
             blogFind.setUrl(blog.getUrl() != null ? blog.getUrl() : blogFind.getUrl());
             blogFind.setAuthor(blog.getAuthor() != null ? blog.getAuthor() : blogFind.getAuthor());
-            //blogFind.setPostList(blog.getPostList() != null ? blog.getPostList() : blogFind.getPostList());
+            blogFind.setPostList(blog.getPostList() != null ? blog.getPostList() : blogFind.getPostList());
             blogFind.setStatus(blog.getStatus() != null ? blog.getStatus() : blogFind.getStatus());
 
             blogRepository.save(blogFind);
