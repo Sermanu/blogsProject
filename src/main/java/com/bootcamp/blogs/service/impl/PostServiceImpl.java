@@ -2,6 +2,7 @@ package com.bootcamp.blogs.service.impl;
 
 import com.bootcamp.blogs.entity.Blog;
 import com.bootcamp.blogs.entity.Post;
+import com.bootcamp.blogs.repository.BlogRepository;
 import com.bootcamp.blogs.repository.PostRepository;
 import com.bootcamp.blogs.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private BlogRepository blogRepository;
 
     @Override
     public ResponseEntity<List<Post>> findAll() {
@@ -58,33 +62,41 @@ public class PostServiceImpl implements PostService {
     public ResponseEntity<Post> save(Post post) {
         try {
 
-            Blog blog = post.getBlog();
+            Optional<Blog> optionalBlog = blogRepository.findById(post.getBlog().getId());
 
-            List<Post> postsOfBlog = blog.getPostList();
+            if (optionalBlog.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            } else {
 
-            boolean canSavePost = true;
+                Blog blog = optionalBlog.get();
 
-            for (Post postItem : postsOfBlog) {
+                List<Post> postsOfBlog = blog.getPostList();
 
-                Date dateOfPostSaved = postItem.getDate();
-                Date dateOfPostToSave = post.getDate();
+                boolean canSavePost = true;
 
-                long diffInMillies = Math.abs(dateOfPostToSave.getTime() - dateOfPostSaved.getTime());
-                long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+                for (Post postItem : postsOfBlog) {
 
-                if (diff < 1) {
-                    canSavePost = false;
-                    break;
+                    Date dateOfPostSaved = postItem.getDate();
+                    Date dateOfPostToSave = post.getDate();
+
+                    long diffInMillies = Math.abs(dateOfPostToSave.getTime() - dateOfPostSaved.getTime());
+                    long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+                    if (diff < 1) {
+                        canSavePost = false;
+                        break;
+                    }
+
                 }
 
-            }
+                if (canSavePost) {
+                    post.setStatus("borrador");
+                    Post postSaved = postRepository.save(post);
+                    return new ResponseEntity<>(postSaved, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+                }
 
-            if (canSavePost) {
-                post.setStatus("borrador");
-                Post postSaved = postRepository.save(post);
-                return new ResponseEntity<>(postSaved, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
             }
 
         } catch (Exception e) {
