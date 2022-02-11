@@ -3,6 +3,7 @@ package com.bootcamp.blogs.service.impl;
 import com.bootcamp.blogs.entity.Comment;
 import com.bootcamp.blogs.entity.Post;
 import com.bootcamp.blogs.repository.CommentRepository;
+import com.bootcamp.blogs.repository.PostRepository;
 import com.bootcamp.blogs.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @Override
     public ResponseEntity<List<Comment>> findAll() {
@@ -56,15 +60,23 @@ public class CommentServiceImpl implements CommentService {
     public ResponseEntity<Comment> save(Comment comment) {
         try {
 
-            Post post = comment.getPost();
+            Optional<Post> optionalPost = postRepository.findById(comment.getPost().getId());
 
-            if (post.getStatus().equals("publicado")) {
-
-                Comment commentSaved = commentRepository.save(comment);
-                return new ResponseEntity<>(commentSaved, HttpStatus.ACCEPTED);
-
+            if (optionalPost.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } else {
-                return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+
+                Post post = optionalPost.get();
+
+                if (post.getStatus().equals("publicado")) {
+
+                    Comment commentSaved = commentRepository.save(comment);
+                    return new ResponseEntity<>(commentSaved, HttpStatus.ACCEPTED);
+
+                } else {
+                    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+                }
+
             }
 
         } catch (Exception e) {
