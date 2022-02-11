@@ -1,8 +1,10 @@
 package com.bootcamp.blogs.service.impl;
 
 import com.bootcamp.blogs.entity.Blog;
+import com.bootcamp.blogs.entity.Comment;
 import com.bootcamp.blogs.entity.Post;
 import com.bootcamp.blogs.repository.BlogRepository;
+import com.bootcamp.blogs.repository.CommentRepository;
 import com.bootcamp.blogs.repository.PostRepository;
 import com.bootcamp.blogs.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private BlogRepository blogRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Override
     public ResponseEntity<List<Post>> findAll() {
@@ -51,8 +56,26 @@ public class PostServiceImpl implements PostService {
     @Override
     public ResponseEntity<Void> delete(Long id) {
         try {
-            postRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.OK);
+
+            Optional<Post> optionalPost = postRepository.findById(id);
+
+            if (optionalPost.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            } else {
+
+                Post postFind = optionalPost.get();
+
+                List<Comment> commentsOfPost = postFind.getCommentList();
+
+                for (Comment commentItem : commentsOfPost) {
+                    commentRepository.delete(commentItem);
+                }
+
+                postRepository.delete(postFind);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+
+
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
