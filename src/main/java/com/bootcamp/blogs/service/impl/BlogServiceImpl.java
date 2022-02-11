@@ -2,6 +2,7 @@ package com.bootcamp.blogs.service.impl;
 
 import com.bootcamp.blogs.entity.Author;
 import com.bootcamp.blogs.entity.Blog;
+import com.bootcamp.blogs.repository.AuthorRepository;
 import com.bootcamp.blogs.repository.BlogRepository;
 import com.bootcamp.blogs.service.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class BlogServiceImpl implements BlogService {
 
     @Autowired
     private BlogRepository blogRepository;
+
+    @Autowired
+    private AuthorRepository authorRepository;
 
     @Override
     public ResponseEntity<List<Blog>> findAll() {
@@ -58,25 +62,35 @@ public class BlogServiceImpl implements BlogService {
     public ResponseEntity<Blog> save(Blog blog) {
         try {
 
-            Author blogAuthor = blog.getAuthor();
 
-            if (blogAuthor.getBlogList().size() >= 3) {
-                return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+            Optional<Author> optionalBlogAuthor = authorRepository.findById(blog.getAuthor().getId());
+
+            if (optionalBlogAuthor.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            } else {
+
+                Author blogAuthor = optionalBlogAuthor.get();
+
+                if (blogAuthor.getBlogList().size() >= 3) {
+                    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+                }
+
+                Date actualDate = new Date();
+                Date birthDateAuthor = blogAuthor.getBirthDate();
+
+                long diffInMillies = Math.abs(actualDate.getTime() - birthDateAuthor.getTime());
+                long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+                if (diff < 18) {
+                    return new ResponseEntity<>(HttpStatus.PRECONDITION_REQUIRED);
+                }
+
+                blog.setStatus("inactivo");
+                Blog blogSaved = blogRepository.save(blog);
+                return new ResponseEntity<>(blogSaved, HttpStatus.OK);
+
             }
 
-            Date actualDate = new Date();
-            Date birthDateAuthor = blogAuthor.getBirthDate();
-
-            long diffInMillies = Math.abs(actualDate.getTime() - birthDateAuthor.getTime());
-            long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-
-            if (diff < 18) {
-                return new ResponseEntity<>(HttpStatus.PRECONDITION_REQUIRED);
-            }
-
-            blog.setStatus("inactivo");
-            Blog blogSaved = blogRepository.save(blog);
-            return new ResponseEntity<>(blogSaved, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
