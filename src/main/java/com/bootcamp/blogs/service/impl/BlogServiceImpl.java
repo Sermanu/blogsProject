@@ -2,8 +2,12 @@ package com.bootcamp.blogs.service.impl;
 
 import com.bootcamp.blogs.entity.Author;
 import com.bootcamp.blogs.entity.Blog;
+import com.bootcamp.blogs.entity.Comment;
+import com.bootcamp.blogs.entity.Post;
 import com.bootcamp.blogs.repository.AuthorRepository;
 import com.bootcamp.blogs.repository.BlogRepository;
+import com.bootcamp.blogs.repository.CommentRepository;
+import com.bootcamp.blogs.repository.PostRepository;
 import com.bootcamp.blogs.service.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +30,12 @@ public class BlogServiceImpl implements BlogService {
 
     @Autowired
     private AuthorRepository authorRepository;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Override
     public ResponseEntity<List<Blog>> findAll() {
@@ -54,8 +64,36 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public ResponseEntity<Void> delete(Long id) {
         try {
-            blogRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.OK);
+
+            Optional<Blog> optionalBlog = blogRepository.findById(id);
+
+            if (optionalBlog.isEmpty()) {
+
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+            } else {
+
+                Blog blogFind = optionalBlog.get();
+
+                List<Post> postsOfBlog = blogFind.getPostList();
+
+                for (Post postItem : postsOfBlog) {
+
+                    List<Comment> commentsOfPost = postItem.getCommentList();
+
+                    for (Comment commentItem : commentsOfPost) {
+
+                        commentRepository.delete(commentItem);
+
+                    }
+
+                    postRepository.delete(postItem);
+                }
+
+                blogRepository.delete(blogFind);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
