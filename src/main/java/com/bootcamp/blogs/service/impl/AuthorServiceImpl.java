@@ -52,9 +52,9 @@ public class AuthorServiceImpl implements AuthorService {
         Optional<Author> findAuthor =authorRepository.findById(id);
 
         if (findAuthor.isEmpty()) {
-            return new ResponseEntity<Author>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            return new ResponseEntity<Author>(findAuthor.get(),HttpStatus.OK);
+            return new ResponseEntity<>(findAuthor.get(),HttpStatus.OK);
         }
 
     }
@@ -67,7 +67,7 @@ public class AuthorServiceImpl implements AuthorService {
             if (author.getBlogList() != null) {
 
                 if (author.getBlogList().size() >= 3) {
-                    return new ResponseEntity<Author>(HttpStatus.PRECONDITION_FAILED);
+                    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
                 } else {
                     author.setBlogList(author.getBlogList());
                 }
@@ -77,9 +77,9 @@ public class AuthorServiceImpl implements AuthorService {
             }
 
             Author authorSaved = authorRepository.save(author);
-            return new ResponseEntity<Author>(authorSaved, HttpStatus.OK);
+            return new ResponseEntity<>(authorSaved, HttpStatus.OK);
         }catch (Exception e) {
-            return new ResponseEntity<Author>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -91,7 +91,7 @@ public class AuthorServiceImpl implements AuthorService {
             Optional<Author> optionalFindAuthor =authorRepository.findById(id);
 
             if (optionalFindAuthor.isEmpty()) {
-                return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } else {
 
                 Author findAuthor = optionalFindAuthor.get();
@@ -120,11 +120,11 @@ public class AuthorServiceImpl implements AuthorService {
                 }
 
                 authorRepository.delete(findAuthor);
-                return new ResponseEntity<Void>(HttpStatus.OK);
+                return new ResponseEntity<>(HttpStatus.OK);
             }
 
         }catch (Exception e){
-            return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -134,7 +134,7 @@ public class AuthorServiceImpl implements AuthorService {
         Optional<Author> optionalFindAuthor =authorRepository.findById(id);
 
         if (optionalFindAuthor.isEmpty()) {
-            return new ResponseEntity<Author>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             Author findAuthor = optionalFindAuthor.get();
 
@@ -146,7 +146,7 @@ public class AuthorServiceImpl implements AuthorService {
 
             authorRepository.save(findAuthor);
 
-            return new ResponseEntity<Author>(findAuthor,HttpStatus.OK);
+            return new ResponseEntity<>(findAuthor,HttpStatus.OK);
         }
     }
 }
