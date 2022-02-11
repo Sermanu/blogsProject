@@ -74,6 +74,7 @@ public class PostServiceImpl implements PostService {
 
                 if (diff < 1) {
                     canSavePost = false;
+                    break;
                 }
 
             }
