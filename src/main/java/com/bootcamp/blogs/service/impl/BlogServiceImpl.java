@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -78,8 +81,10 @@ public class BlogServiceImpl implements BlogService {
                 Date actualDate = new Date();
                 Date birthDateAuthor = blogAuthor.getBirthDate();
 
-                long diffInMillies = Math.abs(actualDate.getTime() - birthDateAuthor.getTime());
-                long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+                LocalDate actualLocalDate = actualDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate birthDateAuthorLocalDate = birthDateAuthor.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+                long diff = ChronoUnit.YEARS.between(birthDateAuthorLocalDate, actualLocalDate);
 
                 if (diff < 18) {
                     return new ResponseEntity<>(HttpStatus.PRECONDITION_REQUIRED);
