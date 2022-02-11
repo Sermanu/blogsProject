@@ -15,6 +15,8 @@ public interface PostService {
 
     ResponseEntity<Post> save (Post post);
 
-    ResponseEntity<Post> update (Post post);
+    ResponseEntity<Post> update (Long id, Post post);
+
+    ResponseEntity<Post> publishPost (Long id);
 
 }
